@@ -9,7 +9,7 @@ error BirdieBucks_Error(string message);
 
 contract BirdieBucksToken is ERC20 {
     address private immutable owner;
-    uint256 private _taxPercentage = 3;
+    uint256 private _taxPercentage = 300;
     address[] public _blacklist;
     address[] public _whitelist;
 
@@ -61,7 +61,7 @@ contract BirdieBucksToken is ERC20 {
         }
 
         if (!checkAccountInArray(from, _whitelist)) {
-            taxAmount = ((value * _taxPercentage) / 100);
+            taxAmount = ((value * _taxPercentage) / 10000);
             super._transfer(from, _taxAccount, taxAmount);
         }
 
@@ -108,10 +108,6 @@ contract BirdieBucksToken is ERC20 {
 
     function getOwner() public view returns (address) {
         return owner;
-    }
-
-    function destroy() public onlyOwner {
-        selfdestruct(payable(owner));
     }
 
     modifier onlyOwner() {
