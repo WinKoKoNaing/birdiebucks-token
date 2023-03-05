@@ -1,18 +1,15 @@
-import { ethers } from "hardhat";
+const hre = require("hardhat");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const BirdieBucksToken = await hre.ethers.getContractFactory(
+    "BirdieBucksToken"
+  );
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  const birdieBucksToken = await BirdieBucksToken.deploy(100000000, 50);
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  await birdieBucksToken.deployed();
 
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  console.log("Ocean Token deployed: ", birdieBucksToken.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
