@@ -9,7 +9,7 @@ async function main() {
 
   await birdieBucksToken.deployed();
 
-  console.log("Ocean Token deployed: ", birdieBucksToken.address);
+  console.log("BirdieBucks Token deployed: ", birdieBucksToken.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
