@@ -79,24 +79,24 @@ describe("BirdieBucksToken contract", function () {
   describe("White and black list", function () {
     it("Should add address to whitelist", async function () {
       await birdieBuckToken.addToWhiteList(addr4.address);
-      assert.equal(await birdieBuckToken.whitelist(addr4.address), true);
+      assert.equal(await birdieBuckToken.whiteList(addr4.address), true);
     });
 
     it("Should add address to blacklist", async function () {
       await birdieBuckToken.addToBlackList(addr4.address);
-      assert.equal(await birdieBuckToken.blacklist(addr4.address), true);
+      assert.equal(await birdieBuckToken.blackList(addr4.address), true);
     });
 
     it("Should remove address from whitelist", async function () {
       await birdieBuckToken.addToWhiteList(addr4.address);
       await birdieBuckToken.removeFromWhiteList(addr4.address);
-      assert.equal(await birdieBuckToken.whitelist(addr4.address), false);
+      assert.equal(await birdieBuckToken.whiteList(addr4.address), false);
     });
 
     it("Should remove address from blacklist", async function () {
       await birdieBuckToken.addToBlackList(addr4.address);
       await birdieBuckToken.removeFromBlackList(addr4.address);
-      assert.equal(await birdieBuckToken.blacklist(addr4.address), false);
+      assert.equal(await birdieBuckToken.blackList(addr4.address), false);
     });
   });
 });

@@ -7,12 +7,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BirdieBucksToken is ERC20, Ownable {
     uint private _taxPercentage = 300;
-    address public _taxAccount = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
+    address private _taxAccount = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
 
-    mapping(address => bool) public blacklist;
-    mapping(address => bool) public whitelist;
-
-
+    mapping(address => bool) private _blacklist;
+    mapping(address => bool) private _whitelist;
 
     constructor() ERC20("BirdieBucks", "BIRDIE") {
         _mint(msg.sender, 1000_000_000 * (10 ** decimals()));
@@ -23,9 +21,9 @@ contract BirdieBucksToken is ERC20, Ownable {
         address to,
         uint256 value
     ) internal virtual override {
-        require(!blacklist[from], "IN_BLACK_LIST");
+        require(!_blacklist[from], "IN_BLACK_LIST");
         uint256 taxAmount = 0;
-        if (!whitelist[from]) {
+        if (!_whitelist[from]) {
             taxAmount = ((value * _taxPercentage) / 10000);
             super._transfer(from, _taxAccount, taxAmount);
         }
@@ -34,23 +32,23 @@ contract BirdieBucksToken is ERC20, Ownable {
     }
 
     function addToBlackList(address account) public onlyOwner {
-        require(!blacklist[account], "ALREADY_IN_BLACK_LIST");
-        blacklist[account] = true;
+        require(!_blacklist[account], "ALREADY_IN_BLACK_LIST");
+        _blacklist[account] = true;
     }
 
     function removeFromBlackList(address account) public onlyOwner {
-        require(blacklist[account], "REMOVED_OR_NOT_FOUND_IN_BLACK_LIST");
-        blacklist[account] = false;
+        require(_blacklist[account], "REMOVED_OR_NOT_FOUND_IN_BLACK_LIST");
+        _blacklist[account] = false;
     }
 
     function addToWhiteList(address account) public onlyOwner {
-        require(!whitelist[account], "ALREADY_IN_WHITE_LIST");
-        whitelist[account] = true;
+        require(!_whitelist[account], "ALREADY_IN_WHITE_LIST");
+        _whitelist[account] = true;
     }
 
     function removeFromWhiteList(address account) public onlyOwner {
-        require(whitelist[account], "REMOVED_OR_NOT_FOUND_IN_WHITE_LIST");
-        whitelist[account] = false;
+        require(_whitelist[account], "REMOVED_OR_NOT_FOUND_IN_WHITE_LIST");
+        _whitelist[account] = false;
     }
 
     function updateTaxPercentage(uint256 amount) public onlyOwner {
@@ -67,6 +65,14 @@ contract BirdieBucksToken is ERC20, Ownable {
 
     function updateTaxAccount(address account) public onlyOwner {
         _taxAccount = account;
+    }
+
+    function blackList(address account) public view returns (bool) {
+        return _blacklist[account];
+    }
+
+    function whiteList(address account) public view returns (bool) {
+        return _whitelist[account];
     }
 }
 

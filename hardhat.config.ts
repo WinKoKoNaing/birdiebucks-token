@@ -9,7 +9,15 @@ dotenv.config();
 
 const mnemonic = process.env.mnemonic;
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
   networks: {
     testnet: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
