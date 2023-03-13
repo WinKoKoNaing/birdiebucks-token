@@ -1,11 +1,17 @@
 const hre = require("hardhat");
 
 async function main() {
+  const [deployer] = await hre.ethers.getSigners();
+
+  console.log("Deploying contracts with the account:", deployer.address);
+
+  console.log("Account balance:", (await deployer.getBalance()).toString());
+
   const BirdieBucksToken = await hre.ethers.getContractFactory(
     "BirdieBucksToken"
   );
 
-  const birdieBucksToken = await BirdieBucksToken.deploy(100000000, 50);
+  const birdieBucksToken = await BirdieBucksToken.deploy();
 
   await birdieBucksToken.deployed();
 
