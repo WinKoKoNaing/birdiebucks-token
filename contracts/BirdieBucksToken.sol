@@ -5,7 +5,7 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-error BirdieBucks__NotOwner();
+// error BirdieBucks__NotOwner();
 error BirdieBucks_Error(string message);
 
 contract BirdieBucksToken is ERC20, Ownable {
