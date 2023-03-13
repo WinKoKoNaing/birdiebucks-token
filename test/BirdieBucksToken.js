@@ -19,7 +19,7 @@ describe("BirdieBucksToken contract", function () {
 
   describe("Deployment", function () {
     it("Should set the right owner", async function () {
-      expect(await birdieBuckToken.getOwner()).to.equal(owner.address);
+      expect(await birdieBuckToken.owner()).to.equal(owner.address);
     });
 
     it("Should assign the total supply of tokens to the owner", async function () {

@@ -3,49 +3,38 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 error BirdieBucks__NotOwner();
 error BirdieBucks_Error(string message);
 
-contract BirdieBucksToken is ERC20 {
-    address private immutable owner;
-    uint256 private _taxPercentage = 300;
-    address[] public _blacklist;
-    address[] public _whitelist;
+contract BirdieBucksToken is ERC20, Ownable {
+    // address private owner;
+    uint private _taxPercentage = 300;
+    mapping(address => bool) public _blacklist;
+    mapping(address => bool) public _whitelist;
 
     address private _taxAccount = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
 
     constructor() ERC20("BirdieBucks", "BIRDIE") {
-        owner = msg.sender;
-        _mint(owner, 1000_000_000 * (10 ** decimals()));
+        // owner = msg.sender;
+        _mint(msg.sender, 1000_000_000 * (10 ** decimals()));
     }
 
-    function checkAccountInArray(
-        address account,
-        address[] memory arr
-    ) internal pure returns (bool) {
-        for (uint256 i = 0; i < arr.length; i++) {
-            if (arr[i] == account) {
-                return true;
-            }
-        }
-
-        return false;
+    // check address using map
+    function contains(
+        address _wallet,
+        mapping(address => bool) storage arr
+    ) internal view returns (bool) {
+        return arr[_wallet];
     }
 
-    function removeAccount(address _account, address[] storage arr) internal {
-        if (arr.length == 1) {
-            arr.pop();
-        } else if (arr[arr.length - 1] == _account) {
-            arr.pop();
-        } else {
-            for (uint256 i = 0; i < arr.length - 1; i++) {
-                if (_account == arr[i]) {
-                    arr[i] = arr[arr.length - 1];
-                    arr.pop();
-                }
-            }
-        }
+    // remove address using loop
+    function remove(
+        address _wallet,
+        mapping(address => bool) storage arr
+    ) internal {
+        delete arr[_wallet];
     }
 
     function _transfer(
@@ -54,13 +43,12 @@ contract BirdieBucksToken is ERC20 {
         uint256 value
     ) internal virtual override {
         uint256 taxAmount = 0;
-        // if (from != address(0) && to != block.coinbase) {}
 
-        if (checkAccountInArray(from, _blacklist)) {
+        if (contains(from, _blacklist)) {
             revert BirdieBucks_Error("The address is in backlist");
         }
 
-        if (!checkAccountInArray(from, _whitelist)) {
+        if (!contains(from, _whitelist)) {
             taxAmount = ((value * _taxPercentage) / 10000);
             super._transfer(from, _taxAccount, taxAmount);
         }
@@ -69,25 +57,25 @@ contract BirdieBucksToken is ERC20 {
     }
 
     function addToBlackList(address account) public onlyOwner {
-        if (checkAccountInArray(account, _blacklist)) {
+        if (contains(account, _blacklist)) {
             revert BirdieBucks_Error("The address is already in backlist");
         }
-        _blacklist.push(account);
+        _blacklist[account] = true;
     }
 
     function removeFromBlackList(address account) public onlyOwner {
-        removeAccount(account, _blacklist);
+        remove(account, _blacklist);
     }
 
     function addToWhiteList(address account) public onlyOwner {
-        if (checkAccountInArray(account, _whitelist)) {
+        if (contains(account, _whitelist)) {
             revert BirdieBucks_Error("The address is already in whitelist");
         }
-        _whitelist.push(account);
+        _whitelist[account] = true;
     }
 
     function removeFromWhiteList(address account) public onlyOwner {
-        removeAccount(account, _whitelist);
+        remove(account, _whitelist);
     }
 
     function updateTaxPercentage(uint256 amount) public onlyOwner {
@@ -106,15 +94,15 @@ contract BirdieBucksToken is ERC20 {
         _taxAccount = account;
     }
 
-    function getOwner() public view returns (address) {
-        return owner;
-    }
+    // function getOwner() public view returns (address) {
+    //     return owner;
+    // }
 
-    modifier onlyOwner() {
-        // require(msg.sender == i_owner);
-        if (msg.sender != owner) revert BirdieBucks__NotOwner();
-        _;
-    }
+    // modifier onlyOwner() {
+    //     // require(msg.sender == i_owner);
+    //     if (msg.sender != owner) revert BirdieBucks__NotOwner();
+    //     _;
+    // }
 }
 
 // owner = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
