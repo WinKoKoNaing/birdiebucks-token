@@ -3,6 +3,8 @@ import "@nomicfoundation/hardhat-toolbox";
 import "solidity-coverage";
 import "hardhat-gas-reporter";
 import * as dotenv from "dotenv";
+// import "hardhat/console.sol";
+
 dotenv.config();
 
 const mnemonic = process.env.mnemonic;

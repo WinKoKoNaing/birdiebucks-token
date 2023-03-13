@@ -5,36 +5,17 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// error BirdieBucks__NotOwner();
-error BirdieBucks_Error(string message);
-
 contract BirdieBucksToken is ERC20, Ownable {
-    // address private owner;
     uint private _taxPercentage = 300;
-    mapping(address => bool) public _blacklist;
-    mapping(address => bool) public _whitelist;
+    address public _taxAccount = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
 
-    address private _taxAccount = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
+    mapping(address => bool) public blacklist;
+    mapping(address => bool) public whitelist;
+
+
 
     constructor() ERC20("BirdieBucks", "BIRDIE") {
-        // owner = msg.sender;
         _mint(msg.sender, 1000_000_000 * (10 ** decimals()));
-    }
-
-    // check address using map
-    function contains(
-        address _wallet,
-        mapping(address => bool) storage arr
-    ) internal view returns (bool) {
-        return arr[_wallet];
-    }
-
-    // remove address using loop
-    function remove(
-        address _wallet,
-        mapping(address => bool) storage arr
-    ) internal {
-        delete arr[_wallet];
     }
 
     function _transfer(
@@ -42,13 +23,9 @@ contract BirdieBucksToken is ERC20, Ownable {
         address to,
         uint256 value
     ) internal virtual override {
+        require(!blacklist[from], "IN_BLACK_LIST");
         uint256 taxAmount = 0;
-
-        if (contains(from, _blacklist)) {
-            revert BirdieBucks_Error("The address is in backlist");
-        }
-
-        if (!contains(from, _whitelist)) {
+        if (!whitelist[from]) {
             taxAmount = ((value * _taxPercentage) / 10000);
             super._transfer(from, _taxAccount, taxAmount);
         }
@@ -57,25 +34,23 @@ contract BirdieBucksToken is ERC20, Ownable {
     }
 
     function addToBlackList(address account) public onlyOwner {
-        if (contains(account, _blacklist)) {
-            revert BirdieBucks_Error("The address is already in backlist");
-        }
-        _blacklist[account] = true;
+        require(!blacklist[account], "ALREADY_IN_BLACK_LIST");
+        blacklist[account] = true;
     }
 
     function removeFromBlackList(address account) public onlyOwner {
-        remove(account, _blacklist);
+        require(blacklist[account], "REMOVED_OR_NOT_FOUND_IN_BLACK_LIST");
+        blacklist[account] = false;
     }
 
     function addToWhiteList(address account) public onlyOwner {
-        if (contains(account, _whitelist)) {
-            revert BirdieBucks_Error("The address is already in whitelist");
-        }
-        _whitelist[account] = true;
+        require(!whitelist[account], "ALREADY_IN_WHITE_LIST");
+        whitelist[account] = true;
     }
 
     function removeFromWhiteList(address account) public onlyOwner {
-        remove(account, _whitelist);
+        require(whitelist[account], "REMOVED_OR_NOT_FOUND_IN_WHITE_LIST");
+        whitelist[account] = false;
     }
 
     function updateTaxPercentage(uint256 amount) public onlyOwner {
@@ -93,16 +68,6 @@ contract BirdieBucksToken is ERC20, Ownable {
     function updateTaxAccount(address account) public onlyOwner {
         _taxAccount = account;
     }
-
-    // function getOwner() public view returns (address) {
-    //     return owner;
-    // }
-
-    // modifier onlyOwner() {
-    //     // require(msg.sender == i_owner);
-    //     if (msg.sender != owner) revert BirdieBucks__NotOwner();
-    //     _;
-    // }
 }
 
 // owner = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4

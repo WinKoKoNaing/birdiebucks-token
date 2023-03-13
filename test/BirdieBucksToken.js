@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+const { expect, assert } = require("chai");
 const hre = require("hardhat");
 
 describe("BirdieBucksToken contract", function () {
@@ -9,13 +9,15 @@ describe("BirdieBucksToken contract", function () {
   let addr1;
   let addr2;
   let addr3;
+  let addr4;
+  let addr5;
 
   const transferAmount = 100;
 
   beforeEach(async function () {
     // Get the ContractFactory and Signers here.
     Token = await hre.ethers.getContractFactory("BirdieBucksToken");
-    [owner, addr1, addr2, addr3] = await hre.ethers.getSigners();
+    [owner, addr1, addr2, addr3, addr4, addr5] = await hre.ethers.getSigners();
 
     birdieBuckToken = await Token.deploy();
   });
@@ -34,7 +36,7 @@ describe("BirdieBucksToken contract", function () {
       expect(await birdieBuckToken.taxPercentage()).to.equal(300);
     });
 
-    it("Should assign taxAccount", async function () {
+    it("Should update taxAccount", async function () {
       await birdieBuckToken.updateTaxAccount(addr3.address);
       expect(await birdieBuckToken.taxAccount()).to.equal(addr3.address);
     });
@@ -59,6 +61,42 @@ describe("BirdieBucksToken contract", function () {
       // Transfer 50 tokens from addr1 to addr2
       // await hardhatToken.connect(addr1).transfer(addr2.address, 50);
       // expect(await hardhatToken.balanceOf(addr2.address)).to.equal(50);
+    });
+  });
+
+  describe("Variables", function () {
+    it("Should update the tax amount", async function () {
+      await birdieBuckToken.updateTaxPercentage(400);
+      expect(await birdieBuckToken.taxPercentage()).to.equal(400);
+    });
+
+    it("Should update the tax address", async function () {
+      await birdieBuckToken.updateTaxAccount(addr3.address);
+      expect(await birdieBuckToken.taxAccount()).to.equal(addr3.address);
+    });
+  });
+
+  describe("White and black list", function () {
+    it("Should add address to whitelist", async function () {
+      await birdieBuckToken.addToWhiteList(addr4.address);
+      assert.equal(await birdieBuckToken.whitelist(addr4.address), true);
+    });
+
+    it("Should add address to blacklist", async function () {
+      await birdieBuckToken.addToBlackList(addr4.address);
+      assert.equal(await birdieBuckToken.blacklist(addr4.address), true);
+    });
+
+    it("Should remove address from whitelist", async function () {
+      await birdieBuckToken.addToWhiteList(addr4.address);
+      await birdieBuckToken.removeFromWhiteList(addr4.address);
+      assert.equal(await birdieBuckToken.whitelist(addr4.address), false);
+    });
+
+    it("Should remove address from blacklist", async function () {
+      await birdieBuckToken.addToBlackList(addr4.address);
+      await birdieBuckToken.removeFromBlackList(addr4.address);
+      assert.equal(await birdieBuckToken.blacklist(addr4.address), false);
     });
   });
 });
