@@ -10,7 +10,14 @@ dotenv.config();
 const mnemonic = process.env.mnemonic;
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.17",
+    compilers: [
+      {
+        version: "0.8.0",
+      },
+      {
+        version: "0.8.16",
+      },
+    ],
     settings: {
       optimizer: {
         enabled: true,

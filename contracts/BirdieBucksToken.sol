@@ -1,6 +1,6 @@
 // contracts/BirdieBucksToken.sol
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -11,6 +11,12 @@ contract BirdieBucksToken is ERC20, Ownable {
 
     mapping(address => bool) private _blacklist;
     mapping(address => bool) private _whitelist;
+
+    event UpdatedPercentage(
+        uint256 indexed oldNum,
+        uint256 indexed newNum,
+        address sender
+    );
 
     constructor() ERC20("BirdieBucks", "BIRDIE") {
         _mint(msg.sender, 1000_000_000 * (10 ** decimals()));
@@ -51,6 +57,7 @@ contract BirdieBucksToken is ERC20, Ownable {
     }
 
     function updateTaxPercentage(uint256 amount) external onlyOwner {
+        emit UpdatedPercentage(_taxPercentage, amount, msg.sender);
         _taxPercentage = amount;
     }
 
@@ -63,6 +70,7 @@ contract BirdieBucksToken is ERC20, Ownable {
     }
 
     function updateTaxAccount(address account) external onlyOwner {
+        require(account != address(0), "NOT_ALLOW_ZERO_ADDR");
         _taxAccount = account;
     }
 
