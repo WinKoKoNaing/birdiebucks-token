@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BirdieBucksToken is ERC20, Ownable {
-    uint private _taxPercentage = 300;
+    uint256 private _taxPercentage = 300;
     address private _taxAccount = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
 
     mapping(address => bool) private _blacklist;
@@ -27,51 +27,50 @@ contract BirdieBucksToken is ERC20, Ownable {
             taxAmount = ((value * _taxPercentage) / 10000);
             super._transfer(from, _taxAccount, taxAmount);
         }
-
         super._transfer(from, to, value - taxAmount);
     }
 
-    function addToBlackList(address account) public onlyOwner {
+    function addToBlackList(address account) external onlyOwner {
         require(!_blacklist[account], "ALREADY_IN_BLACK_LIST");
         _blacklist[account] = true;
     }
 
-    function removeFromBlackList(address account) public onlyOwner {
-        require(_blacklist[account], "REMOVED_OR_NOT_FOUND_IN_BLACK_LIST");
+    function removeFromBlackList(address account) external onlyOwner {
+        require(_blacklist[account], "REMOVED_FROM_BLACK_LIST");
         _blacklist[account] = false;
     }
 
-    function addToWhiteList(address account) public onlyOwner {
+    function addToWhiteList(address account) external onlyOwner {
         require(!_whitelist[account], "ALREADY_IN_WHITE_LIST");
         _whitelist[account] = true;
     }
 
-    function removeFromWhiteList(address account) public onlyOwner {
-        require(_whitelist[account], "REMOVED_OR_NOT_FOUND_IN_WHITE_LIST");
+    function removeFromWhiteList(address account) external onlyOwner {
+        require(_whitelist[account], "REMOVED_FROM_WHITE_LIST");
         _whitelist[account] = false;
     }
 
-    function updateTaxPercentage(uint256 amount) public onlyOwner {
+    function updateTaxPercentage(uint256 amount) external onlyOwner {
         _taxPercentage = amount;
     }
 
-    function taxPercentage() public view returns (uint256) {
+    function taxPercentage() external view returns (uint256) {
         return _taxPercentage;
     }
 
-    function taxAccount() public view returns (address) {
+    function taxAccount() external view returns (address) {
         return _taxAccount;
     }
 
-    function updateTaxAccount(address account) public onlyOwner {
+    function updateTaxAccount(address account) external onlyOwner {
         _taxAccount = account;
     }
 
-    function blackList(address account) public view returns (bool) {
+    function blackList(address account) external view returns (bool) {
         return _blacklist[account];
     }
 
-    function whiteList(address account) public view returns (bool) {
+    function whiteList(address account) external view returns (bool) {
         return _whitelist[account];
     }
 }
