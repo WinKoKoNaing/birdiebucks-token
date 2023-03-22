@@ -11,7 +11,9 @@ async function main() {
     "BirdieBucksToken"
   );
 
-  const birdieBucksToken = await BirdieBucksToken.deploy();
+  const birdieBucksToken = await BirdieBucksToken.deploy(
+    "0x96cC568a75f54BDBda396736788fbbaaB27BF224"
+  );
 
   await birdieBucksToken.deployed();
 

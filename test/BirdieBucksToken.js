@@ -19,7 +19,7 @@ describe("BirdieBucksToken contract", function () {
     Token = await hre.ethers.getContractFactory("BirdieBucksToken");
     [owner, addr1, addr2, addr3, addr4, addr5] = await hre.ethers.getSigners();
 
-    birdieBuckToken = await Token.deploy();
+    birdieBuckToken = await Token.deploy(addr3.address);
   });
 
   describe("Deployment", function () {

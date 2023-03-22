@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BirdieBucksToken is ERC20, Ownable {
     uint256 private _taxPercentage = 300;
-    address private _taxAccount = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
+    address private _taxAccount;
 
     mapping(address => bool) private _blacklist;
     mapping(address => bool) private _whitelist;
@@ -18,7 +18,8 @@ contract BirdieBucksToken is ERC20, Ownable {
         address sender
     );
 
-    constructor() ERC20("BirdieBucks", "BIRDIE") {
+    constructor(address taxAddress) ERC20("BirdieBucks", "BIRDIE") {
+        _taxAccount = taxAddress;
         _mint(msg.sender, 1000_000_000 * (10 ** decimals()));
     }
 
