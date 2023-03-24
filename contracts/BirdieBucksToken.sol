@@ -30,10 +30,11 @@ contract BirdieBucksToken is ERC20, Ownable {
     ) internal virtual override {
         require(!_blacklist[from], "IN_BLACK_LIST");
         uint256 taxAmount = 0;
-        if (!_whitelist[from]) {
+        if (!_whitelist[from] && _taxPercentage != 0) {
             taxAmount = ((value * _taxPercentage) / 10000);
             super._transfer(from, _taxAccount, taxAmount);
         }
+
         super._transfer(from, to, value - taxAmount);
     }
 
