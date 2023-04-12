@@ -7,12 +7,26 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BirdieBucksToken is ERC20, Ownable {
     uint256 private _taxPercentage = 300;
+    uint256 private _limitedTokenAmount = 1_000_000;
+    bool private _isLimitedAmount = false;
     address private _taxAccount;
 
     mapping(address => bool) private _blacklist;
     mapping(address => bool) private _whitelist;
 
     event UpdatedPercentage(
+        uint256 indexed oldNum,
+        uint256 indexed newNum,
+        address sender
+    );
+
+    event UpdatedIsLimitedAmount(
+        bool indexed oldNum,
+        bool indexed newNum,
+        address sender
+    );
+
+    event UpdatedLimitedTokenAmount(
         uint256 indexed oldNum,
         uint256 indexed newNum,
         address sender
@@ -29,12 +43,12 @@ contract BirdieBucksToken is ERC20, Ownable {
         uint256 value
     ) internal virtual override {
         require(!_blacklist[from], "IN_BLACK_LIST");
+        require(balanceOf(to) < _limitedTokenAmount, "EXCEED_LIMITED_AMOUNT");
         uint256 taxAmount = 0;
         if (!_whitelist[from] && _taxPercentage != 0) {
             taxAmount = ((value * _taxPercentage) / 10000);
             super._transfer(from, _taxAccount, taxAmount);
         }
-
         super._transfer(from, to, value - taxAmount);
     }
 
@@ -63,8 +77,26 @@ contract BirdieBucksToken is ERC20, Ownable {
         _taxPercentage = amount;
     }
 
+    function limitedAmount() external view returns (uint256) {
+        return _limitedTokenAmount;
+    }
+
+    function updatedLimitedTokenAmount(uint256 amount) external onlyOwner {
+        emit UpdatedLimitedTokenAmount(_limitedTokenAmount, amount, msg.sender);
+        _limitedTokenAmount = amount;
+    }
+
     function taxPercentage() external view returns (uint256) {
         return _taxPercentage;
+    }
+
+    function isLimitedAmount() external view returns (bool) {
+        return _isLimitedAmount;
+    }
+
+    function updateIsLimitedAmount(bool isLimited) external onlyOwner {
+        emit UpdatedIsLimitedAmount(_isLimitedAmount, isLimited, msg.sender);
+        _isLimitedAmount = isLimited;
     }
 
     function taxAccount() external view returns (address) {
