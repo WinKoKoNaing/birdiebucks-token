@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BirdieBucksToken is ERC20, Ownable {
     uint256 private _taxPercentage = 300;
-    uint256 private _limitedTokenAmount = 1_000_000;
-    bool private _isLimitedAmount = false;
+    uint256 private _antiwillAmount = 1_000_000;
+    bool private _antiwillOnOff = false;
     address private _taxAccount;
 
     mapping(address => bool) private _blacklist;
@@ -20,13 +20,13 @@ contract BirdieBucksToken is ERC20, Ownable {
         address sender
     );
 
-    event UpdatedIsLimitedAmount(
-        bool indexed oldNum,
-        bool indexed newNum,
+    event UpdatedAntiwillOnOff(
+        bool indexed oldAntiwillOnOff,
+        bool indexed newAntiwillOnOff,
         address sender
     );
 
-    event UpdatedLimitedTokenAmount(
+    event UpdatedAntiwillAmount(
         uint256 indexed oldNum,
         uint256 indexed newNum,
         address sender
@@ -44,7 +44,7 @@ contract BirdieBucksToken is ERC20, Ownable {
     ) internal virtual override {
         require(!_blacklist[from], "IN_BLACK_LIST");
         require(
-            balanceOf(to) < _limitedTokenAmount || !_isLimitedAmount,
+            balanceOf(to) < _antiwillAmount || !_antiwillOnOff,
             "EXCEED_LIMITED_AMOUNT"
         );
         uint256 taxAmount = 0;
@@ -80,26 +80,26 @@ contract BirdieBucksToken is ERC20, Ownable {
         _taxPercentage = amount;
     }
 
-    function limitedAmount() external view returns (uint256) {
-        return _limitedTokenAmount;
-    }
-
-    function updatedLimitedTokenAmount(uint256 amount) external onlyOwner {
-        emit UpdatedLimitedTokenAmount(_limitedTokenAmount, amount, msg.sender);
-        _limitedTokenAmount = amount;
-    }
-
     function taxPercentage() external view returns (uint256) {
         return _taxPercentage;
     }
 
-    function isLimitedAmount() external view returns (bool) {
-        return _isLimitedAmount;
+    function antiwillAmount() external view returns (uint256) {
+        return _antiwillAmount;
     }
 
-    function updateIsLimitedAmount(bool isLimited) external onlyOwner {
-        emit UpdatedIsLimitedAmount(_isLimitedAmount, isLimited, msg.sender);
-        _isLimitedAmount = isLimited;
+    function updateAntiwillAmount(uint256 amount) external onlyOwner {
+        emit UpdatedAntiwillAmount(_antiwillAmount, amount, msg.sender);
+        _antiwillAmount = amount;
+    }
+
+    function antiwillOnOff() external view returns (bool) {
+        return _antiwillOnOff;
+    }
+
+    function updateAntiwillOnOff(bool antiwill) external onlyOwner {
+        emit UpdatedAntiwillOnOff(_antiwillOnOff, antiwill, msg.sender);
+        _antiwillOnOff = antiwill;
     }
 
     function taxAccount() external view returns (address) {
