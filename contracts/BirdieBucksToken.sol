@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BirdieBucksToken is ERC20, Ownable {
     uint256 private _taxPercentage = 300;
-    uint256 private _antiwillAmount = 1_000_000;
-    bool private _antiwillOnOff = false;
+    uint256 private _antiWhaleAmount = 1_000_000;
+    bool private _antiWhaleOnOff = false;
     address private _taxAccount;
 
     mapping(address => bool) private _blacklist;
@@ -20,13 +20,13 @@ contract BirdieBucksToken is ERC20, Ownable {
         address sender
     );
 
-    event UpdatedAntiwillOnOff(
-        bool indexed oldAntiwillOnOff,
-        bool indexed newAntiwillOnOff,
+    event UpdatedAntiWhaleOnOff(
+        bool indexed oldAntiwhaleOnOff,
+        bool indexed newAntiWhaleOnOff,
         address sender
     );
 
-    event UpdatedAntiwillAmount(
+    event UpdatedAntiWhaleAmount(
         uint256 indexed oldNum,
         uint256 indexed newNum,
         address sender
@@ -44,8 +44,8 @@ contract BirdieBucksToken is ERC20, Ownable {
     ) internal virtual override {
         require(!_blacklist[from], "IN_BLACK_LIST");
         require(
-            balanceOf(to) < (_antiwillAmount * (10 ** decimals())) ||
-                !_antiwillOnOff,
+            balanceOf(to) < (_antiWhaleAmount * (10 ** decimals())) ||
+                !_antiWhaleOnOff,
             "EXCEED_LIMITED_AMOUNT"
         );
         uint256 taxAmount = 0;
@@ -85,22 +85,22 @@ contract BirdieBucksToken is ERC20, Ownable {
         return _taxPercentage;
     }
 
-    function antiwillAmount() external view returns (uint256) {
-        return _antiwillAmount;
+    function antiWhaleAmount() external view returns (uint256) {
+        return _antiWhaleAmount;
     }
 
-    function updateAntiwillAmount(uint256 amount) external onlyOwner {
-        emit UpdatedAntiwillAmount(_antiwillAmount, amount, msg.sender);
-        _antiwillAmount = amount;
+    function updateAntiWhaleAmount(uint256 amount) external onlyOwner {
+        emit UpdatedAntiWhaleAmount(_antiWhaleAmount, amount, msg.sender);
+        _antiWhaleAmount = amount;
     }
 
-    function antiwillOnOff() external view returns (bool) {
-        return _antiwillOnOff;
+    function antiWhaleOnOff() external view returns (bool) {
+        return _antiWhaleOnOff;
     }
 
-    function updateAntiwillOnOff(bool antiwill) external onlyOwner {
-        emit UpdatedAntiwillOnOff(_antiwillOnOff, antiwill, msg.sender);
-        _antiwillOnOff = antiwill;
+    function updateAntiWhaleOnOff(bool antiwhale) external onlyOwner {
+        emit UpdatedAntiWhaleOnOff(_antiWhaleOnOff, antiwhale, msg.sender);
+        _antiWhaleOnOff = antiwhale;
     }
 
     function taxAccount() external view returns (address) {
